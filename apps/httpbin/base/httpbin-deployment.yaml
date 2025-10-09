@@ -6,7 +6,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: httpbin
+        app: httpbin
   template:
     metadata:
       labels:
@@ -16,4 +16,4 @@ spec:
       - name: httpbin
         image: kennethreitz/httpbin
         ports:
-        - containerPort: 80
+          - containerPort: 80

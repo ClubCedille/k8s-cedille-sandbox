@@ -7,4 +7,4 @@ spec:
   delegations:
     - secretName: sandbox-tls
       targetNamespaces:
-      - "*"
+        - "*"

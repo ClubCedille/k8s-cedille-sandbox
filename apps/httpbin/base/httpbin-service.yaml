@@ -4,7 +4,7 @@ metadata:
   name: httpbin
 spec:
   selector:
-    app: httpbin
+      app: httpbin
   ports:
   - protocol: TCP
     port: 80
