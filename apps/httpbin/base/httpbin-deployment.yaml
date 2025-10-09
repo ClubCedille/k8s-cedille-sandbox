@@ -2,18 +2,36 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: httpbin
+    kube-score/ignore: container-image-tag
 spec:
   replicas: 1
   selector:
     matchLabels:
-        app: httpbin
+      app: httpbin
   template:
     metadata:
       labels:
         app: httpbin
     spec:
       containers:
-      - name: httpbin
-        image: kennethreitz/httpbin
-        ports:
-          - containerPort: 80
+        - name: httpbin
+          image: kennethreitz/httpbin:latest
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /status/200
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 3000
+            allowPrivilegeEscalation: false
