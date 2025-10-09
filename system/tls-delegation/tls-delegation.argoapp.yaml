@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tls-delegation
+  namespace: argocd
+spec:
+  destination:
+    namespace: tls-delegation
+    server: https://cedille.kubernetes.omni.siderolabs.io?cluster=k8s-cedille-sandbox
+  project: k8s-cedille-sandbox
+  source:
+    path: system/tls-delegation
+    repoURL: https://github.com/ClubCedille/k8s-cedille-sandbox.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
