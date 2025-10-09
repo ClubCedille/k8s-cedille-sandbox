@@ -7,7 +7,7 @@ spec:
   destination:
     namespace: docmost
     server: https://cedille.kubernetes.omni.siderolabs.io?cluster=k8s-cedille-sandbox
-  project: k8s-shared
+  project: k8s-cedille-sandbox
   source:
     path: apps/docmost/prod
     repoURL: https://github.com/ClubCedille/k8s-cedille-sandbox.git
