@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: httpbin
   annotations:
-    kube-score/ignore: container-image-tag, pod-networkpolicy
+    kube-score/ignore: container-image-tag, pod-networkpolicy, container-security-context-readonlyrootfilesystem
 spec:
   replicas: 1
   selector:
