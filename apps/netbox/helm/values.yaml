@@ -1,0 +1,347 @@
+# Default values for NetBox.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+## @section NetBox Configuration parameters
+
+# You can also use an existing secret for the superuser password and API token
+# See `existingSecret` for details
+superuser:
+  name: admin
+  email: admin@example.com
+  password: "Bacon123"
+  apiToken: ""
+  existingSecret: ""
+
+# This is a list of valid fully-qualified domain names (FQDNs) for the NetBox
+# server. NetBox will not permit write access to the server via any other
+# hostnames. The first FQDN in the list will be treated as the preferred name.
+allowedHosts:
+- "*"
+
+# Include Pod IP in list of allowed hosts by providing it as the 'POD_IP' envvar
+# at runtime, which is then used in the configuration.py.
+allowedHostsIncludesPodIP: true
+
+# Specify one or more name and email address tuples representing NetBox
+# administrators. These people will be notified of application errors (assuming
+# correct email settings are provided).
+# admins:
+#   - ['John Doe', 'jdoe@example.com']
+admins: []
+
+# Permit the retrieval of API tokens after their creation.
+allowTokenRetrieval: false
+
+# This parameter acts as a pass-through for configuring Django's built-in
+# password validators for local user accounts. If configured, these will be
+# applied whenever a user's password is updated to ensure that it meets minimum
+# criteria such as length or complexity.
+# https://netboxlabs.com/docs/netbox/en/stable/configuration/security/#auth_password_validators
+authPasswordValidators: []
+
+# URL schemes that are allowed within links in NetBox
+allowedUrlSchemes:
+- file
+- ftp
+- ftps
+- http
+- https
+- irc
+- mailto
+- sftp
+- ssh
+- tel
+- telnet
+- tftp
+- vnc
+- xmpp
+
+banner:
+  # Optionally display a persistent banner at the top and/or bottom of every
+  # page. HTML is allowed.
+  top: ""
+  bottom: ""
+
+  # Text to include on the login page above the login form. HTML is allowed.
+  login: ""
+
+# Maximum number of days to retain logged changes. Set to 0 to retain change
+# logs indefinitely. (Default: 90)
+changelogRetention: 90
+
+# This is a mapping of models to custom validators that have been defined
+# locally to enforce custom validation logic.
+# https://netboxlabs.com/docs/netbox/en/stable/configuration/data-validation/#custom_validators
+customValidators: {}
+
+# This is a dictionary defining the default preferences to be set for newly-
+# created user accounts.
+# https://netboxlabs.com/docs/netbox/en/stable/configuration/default-values/#default_user_preferences
+# defaultUserPreferences:
+#   pagination:
+#     per_page: 100
+defaultUserPreferences: {}
+
+# API Cross-Origin Resource Sharing (CORS) settings. If originAllowAll
+# is set to true, all origins will be allowed. Otherwise, define a list of
+# allowed origins using either originWhitelist or originRegexWhitelist. For
+# more information, see https://github.com/ottoyiu/django-cors-headers
+cors:
+  originAllowAll: false
+  originWhitelist: [ "https://netbox.sandbox.cedille.club", "https://netbox.etsmtl.club" ]
+  originRegexWhitelist: []
+  #  - '^(https?://)?(\w+\.)?example\.com$'
+
+  # CSRF settings.  Needed for netbox v3.2.0 and newer. For more information
+  # see https://netboxlabs.com/docs/netbox/en/stable/configuration/security/#csrf_trusted_origins
+csrf:
+  # The name of the cookie to use for the cross-site request forgery (CSRF)
+  # authentication token.
+  cookieName: csrftoken
+  # Defines a list of trusted origins for unsafe (e.g. POST) requests. This is
+  # a pass-through to Django's CSRF_TRUSTED_ORIGINS setting. Note that each
+  # host listed must specify a scheme (e.g. http:// or `https://).
+  trustedOrigins: [ "https://netbox.sandbox.cedille.club", "https://netbox.etsmtl.club" ]
+
+# Enable the GraphQL API
+graphQlEnabled: false
+
+# Setting this to True will permit only authenticated users to access any part
+# of NetBox. By default, anonymous users are permitted to access most data in
+# NetBox but not make any changes.
+loginRequired: true
+
+# When determining the primary IP address for a device, IPv6 is preferred over
+# IPv4 by default. Set this to True to prefer IPv4 instead.
+preferIPv4: true
+
+# Rack elevation size defaults, in pixels. For best results, the ratio of width
+# to height should be roughly 10:1.
+rackElevationDefaultUnitHeight: 22
+rackElevationDefaultUnitWidth: 220
+
+# Remote authentication support
+remoteAuth:
+  enabled: false
+  backends:
+  - netbox.authentication.RemoteUserBackend
+  header: HTTP_REMOTE_USER
+  userFirstName: HTTP_REMOTE_USER_FIRST_NAME
+  userLastName: HTTP_REMOTE_USER_LAST_NAME
+  userEmail: HTTP_REMOTE_USER_EMAIL
+  autoCreateUser: false
+  autoCreateGroups: false
+  defaultGroups: []
+  defaultPermissions: {}
+  groupSyncEnabled: false
+  groupHeader: HTTP_REMOTE_USER_GROUP
+  superuserGroups: []
+  superusers: []
+  staffGroups: []
+  staffUsers: []
+  groupSeparator: "|"
+
+  # The following options are specific for backend "netbox.authentication.LDAPBackend"
+  # you can use an existing netbox secret with "ldap_bind_password" instead of "bindPassword"
+  # see https://django-auth-ldap.readthedocs.io
+  ldap:
+    # serverUri: ldap://example.com
+    serverUri: ""
+    startTls: true
+    ignoreCertErrors: false
+    caCertDir: ""
+    caCertData: ""
+    # bindDn: CN=Netbox,OU=EmbeddedDevices,OU=MyCompany,DC=example,dc=com
+    bindDn: ""
+    bindPassword: ""
+    userDnTemplate: ""
+    # userSearchBaseDn: OU=Users,OU=MyCompany,DC=example,dc=com
+    userSearchBaseDn: ""
+    userSearchAttr: sAMAccountName
+    # groupSearchBaseDn: OU=Groups,OU=MyCompany,DC=example,dc=com
+    groupSearchBaseDn: ""
+    groupSearchClass: group
+    groupType: GroupOfNamesType
+    # requireGroupDn:
+    #   - CN=Network Configuration Operators,CN=Builtin,DC=example,dc=com
+    #   - CN=Domain Admins,CN=Users,DC=example,dc=com
+    requireGroupDn: []
+    # isAdminDn:
+    #   - CN=Domain Admins,CN=Users,DC=example,dc=com
+    isAdminDn: []
+    # isSuperUserDn:
+    #   - CN=Domain Admins,CN=Users,DC=example,dc=com
+    isSuperUserDn: []
+    findGroupPerms: true
+    mirrorGroups: true
+    mirrorGroupsExcept: []
+    cacheTimeout: 3600
+    attrFirstName: givenName
+    attrLastName: sn
+    attrMail: mail
+
+releaseCheck:
+  # This repository is used to check whether there is a new release of NetBox
+  # available. Set to null to disable the version check or use the URL below to
+  # check for release in the official NetBox repository.
+  # url: https://api.github.com/repos/netbox-community/netbox/releases
+  url: ""
+
+# Maximum execution time for background tasks, in seconds.
+# Default value 300 is 5 minutes
+rqDefaultTimeout: 300
+
+# The name to use for the session cookie.
+sessionCookieName: sessionid
+
+# Localization
+enableLocalization: false
+
+# Time zone (default: UTC)
+timeZone: UTC
+
+# Date/time formatting. See the following link for supported formats:
+# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+dateFormat: "N j, Y"
+shortDateFormat: "Y-m-d"
+timeFormat: "g:i a"
+shortTimeFormat: "H:i:s"
+dateTimeFormat: "N j, Y g:i a"
+shortDateTimeFormat: "Y-m-d H:i"
+
+## Extra configuration settings
+# You can pass additional YAML files to be loaded into NetBox's configuration.
+# These can be passed as arbitrary configuration values set in the chart, or
+# you can load arbitrary *.yaml keys from ConfigMaps and Secrets.
+# extraConfig:
+#   - values:
+#       EXTRA_SETTING_ONE: example
+#       ANOTHER_SETTING: foobar
+#   - configMap: # pod.spec.volumes.configMap
+#       name: netbox-extra
+#       items: []
+#       optional: false
+#   - secret: # same as pod.spec.volumes.secret
+#       secretName: netbox-extra
+#       items: []
+#       optional: false
+extraConfig: []
+
+# If provided, this should be a 50+ character string of random characters. It
+# will be randomly generated if left blank.
+# You can also use an existing secret with "secret_key" instead of "secretKey"
+# See `existingSecret` for details
+secretKey: ""
+
+## Provide passwords using existing secret
+# If set, this Secret must contain the following keys:
+# - secret_key: session encryption token (50+ random characters)
+existingSecret: ""
+
+persistence:
+  enabled: false
+  ## Data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "cephfs"
+  accessMode: ReadWriteOnce
+  size: 5Gi
+
+## Container's resource requests and limits
+## ref: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+## We usually recommend not to specify default resources and to leave this as a conscious
+## choice for the user. This also increases chances charts run on environments with little
+## resources, such as Minikube. If you do want to specify resources, uncomment the following
+## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+## @param resourcesPreset Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge).
+## This is ignored if resources is set (resources is recommended for production).
+## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
+##
+resourcesPreset: "small"
+
+## @section Databases parameters
+
+## PostgreSQL chart configuration
+## https://github.com/bitnami/charts/blob/main/bitnami/postgresql/values.yaml
+##
+postgresql:
+  ## @param postgresql.enabled Whether to deploy a PostgreSQL server to satisfy the applications database requirements
+  ## To use an external database set this to false and configure the externalDatabase parameters
+  ##
+  enabled: true
+  auth:
+    username: netbox1
+    database: Bacon123
+
+debug: true
+dbWaitDebug: true
+
+## External database configuration
+## @param externalDatabase.host Host of the existing database
+## @param externalDatabase.port Port of the existing database
+## @param externalDatabase.username Existing username in the external db
+## @param externalDatabase.password Password for the above username
+## @param externalDatabase.database Name of the existing database
+## @param externalDatabase.existingSecretName Name of a secret containing the database credentials
+## @param externalDatabase.existingSecretKey Key of a secret containing the database credentials
+##
+externalDatabase:
+  host: netbox-postgresql
+  port: 5432
+  database: netbox
+  username: netbox1
+  password: "Bacon123"
+  existingSecretName: ""
+  existingSecretKey: postgresql-password
+
+  # The following settings also apply when using the bundled PostgreSQL chart:
+  engine: django.db.backends.postgresql
+  connMaxAge: 300
+  disableServerSideCursors: false
+  ## @param externalDatabase.options Additional PostgreSQL client parameters
+  ## Ref: https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS
+  ##
+  options:
+    sslmode: "prefer"
+    target_session_attrs: "read-write"
+
+## Additional databases configuration
+## @param additionalDatabases.*.host Host of the existing database
+## @param additionalDatabases.*.port Port of the existing database
+## @param additionalDatabases.*.username Existing username in the external db
+## @param additionalDatabases.*.password Password for the above username
+## @param additionalDatabases.*.database Name of the existing database
+## e.g:
+## additionalDatabases:
+##   external2:
+##     host: localhost
+##     port: 5432
+##     database: netbox
+##     username: netbox
+##     password: ""
+##     engine: django.db.backends.postgresql
+##     connMaxAge: 300
+##     disableServerSideCursors: false
+##     options:
+##       sslmode: "prefer"
+##       target_session_attrs: "read-write"
+##
+additionalDatabases: {}
+
+## Valkey chart configuration
+## https://github.com/bitnami/charts/blob/main/bitnami/valkey/values.yaml
+## @param valkey.enabled Whether to deploy a Valkey server to satisfy the applications database requirements
+##
+valkey:
+  enabled: true
+  sentinel:
+    enabled: false
+    primarySet: netbox-kv
+  auth:
+    # Sentinel auth is disabled by default, as Netbox does not support configuring SENTINEL_KWARGS.
+    sentinel: false
