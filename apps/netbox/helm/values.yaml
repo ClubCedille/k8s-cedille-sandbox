@@ -17,7 +17,7 @@ superuser:
 # server. NetBox will not permit write access to the server via any other
 # hostnames. The first FQDN in the list will be treated as the preferred name.
 allowedHosts:
-- "*"
+  - "*"
 
 # Include Pod IP in list of allowed hosts by providing it as the 'POD_IP' envvar
 # at runtime, which is then used in the configuration.py.
@@ -42,20 +42,20 @@ authPasswordValidators: []
 
 # URL schemes that are allowed within links in NetBox
 allowedUrlSchemes:
-- file
-- ftp
-- ftps
-- http
-- https
-- irc
-- mailto
-- sftp
-- ssh
-- tel
-- telnet
-- tftp
-- vnc
-- xmpp
+  - file
+  - ftp
+  - ftps
+  - http
+  - https
+  - irc
+  - mailto
+  - sftp
+  - ssh
+  - tel
+  - telnet
+  - tftp
+  - vnc
+  - xmpp
 
 banner:
   # Optionally display a persistent banner at the top and/or bottom of every
@@ -89,7 +89,8 @@ defaultUserPreferences: {}
 # more information, see https://github.com/ottoyiu/django-cors-headers
 cors:
   originAllowAll: false
-  originWhitelist: [ "https://netbox.sandbox.cedille.club", "https://netbox.etsmtl.club" ]
+  originWhitelist:
+    ["https://netbox.sandbox.cedille.club", "https://netbox.etsmtl.club"]
   originRegexWhitelist: []
   #  - '^(https?://)?(\w+\.)?example\.com$'
 
@@ -102,7 +103,8 @@ csrf:
   # Defines a list of trusted origins for unsafe (e.g. POST) requests. This is
   # a pass-through to Django's CSRF_TRUSTED_ORIGINS setting. Note that each
   # host listed must specify a scheme (e.g. http:// or `https://).
-  trustedOrigins: [ "https://netbox.sandbox.cedille.club", "https://netbox.etsmtl.club" ]
+  trustedOrigins:
+    ["https://netbox.sandbox.cedille.club", "https://netbox.etsmtl.club"]
 
 # Enable the GraphQL API
 graphQlEnabled: false
@@ -125,7 +127,7 @@ rackElevationDefaultUnitWidth: 220
 remoteAuth:
   enabled: false
   backends:
-  - netbox.authentication.RemoteUserBackend
+    - netbox.authentication.RemoteUserBackend
   header: HTTP_REMOTE_USER
   userFirstName: HTTP_REMOTE_USER_FIRST_NAME
   userLastName: HTTP_REMOTE_USER_LAST_NAME
