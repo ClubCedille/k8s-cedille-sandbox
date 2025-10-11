@@ -9,7 +9,7 @@ spec:
     server: https://cedille.kubernetes.omni.siderolabs.io?cluster=k8s-cedille-sandbox
   project: k8s-cedille-sandbox
   source:
-    path: apps/netbox/prod
+    path: apps/netbox
     repoURL: https://github.com/ClubCedille/k8s-cedille-sandbox.git
     targetRevision: HEAD
   syncPolicy:
