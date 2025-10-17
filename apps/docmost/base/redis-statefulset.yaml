@@ -56,12 +56,3 @@ spec:
             allowPrivilegeEscalation: false
       imagePullSecrets:
         - name: dockerhub-pull
-  volumeClaimTemplates:
-    - metadata:
-        name: redis-pv-claim
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 5Gi
-        storageClassName: cephfs
