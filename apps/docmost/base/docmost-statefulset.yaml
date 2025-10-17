@@ -78,12 +78,3 @@ spec:
             - mountPath: /app/data/storage
               name: docmost-pv-claim
       restartPolicy: Always
-  volumeClaimTemplates:
-    - metadata:
-        name: docmost-pv-claim
-      spec:
-        accessModes: ["ReadWriteMany"]
-        resources:
-          requests:
-            storage: 15Gi
-        storageClassName: cephfs
