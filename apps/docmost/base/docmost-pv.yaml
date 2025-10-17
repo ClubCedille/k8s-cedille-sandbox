@@ -7,7 +7,7 @@ spec:
     storage: 10Gi
   volumeMode: Filesystem
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Delete
   storageClassName: local-path
   local:
@@ -15,11 +15,11 @@ spec:
   nodeAffinity:
     required:
       nodeSelectorTerms:
-      - matchExpressions:
-        - key: disktype
-          operator: In
-          values:
-          - ssd
+        - matchExpressions:
+            - key: disktype
+              operator: In
+              values:
+                - ssd
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
