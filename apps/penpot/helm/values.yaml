@@ -625,27 +625,9 @@ exporter:
 
 persistence:
   assets:
-    # -- Enable Penpot objects persistence using Persistent Volume Claims.
-    # @section -- Persistence parameters
     enabled: true
-    # -- Penpot objects persistent Volume storage class.
-    # If defined, storageClassName: <storageClass>.
-    # If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner.
-    # @section -- Persistence parameters
-    storageClass: "local-path"
-    # -- Penpot objects persistent Volume size.
-    # @section -- Persistence parameters
-    size: 20Gi
-    # -- The name of an existing PVC to use for Penpot objects persistence.
-    # @section -- Persistence parameters
-    existingClaim: ""
-    # -- Penpot objects persistent Volume access modes.
-    # @section -- Persistence parameters
-    accessModes:
-      - ReadWriteOnce
-    # -- Penpot objects persistent Volume Claim annotations.
-    # @section -- Persistence parameters
-    annotations: {}
+    existingClaim: "penpot-persistance"
+
   exporter:
     # -- Enable exporter persistence using Persistent Volume Claims. If exporter.replicaCount you have to enable it.
     # @section -- Persistence parameters
@@ -668,36 +650,7 @@ persistence:
     annotations: {}
 
 ingress:
-  # -- Enable (frontend) Ingress Controller.
-  # @section -- Ingress parameters
   enabled: false
-  # -- The Ingress className.
-  # @section -- Ingress parameters
-  className: ""
-  # -- Mapped annotations for the ingress crontroller.
-  # E.g.
-  # annotations:
-  #   kubernetes.io/ingress.class: nginx
-  #   kubernetes.io/tls-acme: "true"
-  # @section -- Ingress parameters
-  annotations: {}
-  # -- Root path for every hosts.
-  # @section -- Ingress parameters
-  path: "/"
-  # -- Array style hosts for the (frontend) ingress crontroller.
-  # @section -- Ingress parameters
-  hosts:
-    # -- The default external hostname to access to the penpot app.
-    # @section -- Ingress parameters
-    - "penpot.example.com"
-  # -- Array style TLS secrets for the (frontend) ingress crontroller.
-  # E.g.
-  # tls:
-  #   - secretName: penpot.example.com-tls
-  #     hosts:
-  #       - penpot.example.com
-  # @section -- Ingress parameters
-  tls: []
 
 route:
   # -- Enable Openshift/OKD Route. Check [the official doc](https://docs.openshift.com/container-platform/4.16/networking/routes/route-configuration.html). When it is enabled, all fsGroup and runAsUser must be changed to null.
