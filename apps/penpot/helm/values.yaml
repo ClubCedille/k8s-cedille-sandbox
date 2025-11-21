@@ -9,7 +9,7 @@ global:
   # @section -- Global parameters
   valkeyEnabled: false
   # -- Whether to deploy the Bitnami Redis chart as subchart. Check [the official chart](https://artifacthub.io/packages/helm/bitnami/redis) for configuration.
-  # *DEPRECATION WARNING: Since Penpot 2.8, Penpot has migrated from Redis to Valkey. Although migration is recommended, Penpot will work seamlessly with compatible Redis versions. 
+  # *DEPRECATION WARNING: Since Penpot 2.8, Penpot has migrated from Redis to Valkey. Although migration is recommended, Penpot will work seamlessly with compatible Redis versions.
   # @section -- Global parameters
   redisEnabled: false
   # -- Global Docker registry secret names.
@@ -632,7 +632,7 @@ persistence:
     # If defined, storageClassName: <storageClass>.
     # If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner.
     # @section -- Persistence parameters
-    storageClass: "cephfs"
+    storageClass: "default"
     # -- Penpot objects persistent Volume size.
     # @section -- Persistence parameters
     size: 20Gi
@@ -767,7 +767,7 @@ valkey:
   # -- Common configuration to be appended to valkey.conf (as a block of configuration lines).
   # @section -- Valkey Dependencie parameters
   commonConfiguration: |
-    ## Recommended values for most Penpot instances. 
+    ## Recommended values for most Penpot instances.
     ## You can modify this value to follow your policies.
 
     # Set maximum memory Valkey will use.
@@ -784,7 +784,7 @@ valkey:
     maxmemory-policy volatile-lfu
 
 # Redis configuration (Check for [more parameters here](https://artifacthub.io/packages/helm/bitnami/redis))
-# DEPRECATION WARNING: Since Penpot 2.8, Penpot has migrated from Redis to Velkey. Although migration is recommended. Penpot will work seamlessly with compatible Redis versions. 
+# DEPRECATION WARNING: Since Penpot 2.8, Penpot has migrated from Redis to Velkey. Although migration is recommended. Penpot will work seamlessly with compatible Redis versions.
 redis:
   image:
     repository: bitnamilegacy/redis
