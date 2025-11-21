@@ -54,3 +54,14 @@ spec:
     requests:
       storage: 10Gi
   storageClassName: local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: penpot-persistance
+spec:
+  accessModes: [ReadWriteMany]
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: local-path
