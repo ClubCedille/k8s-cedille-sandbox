@@ -49,7 +49,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: penpot-pv-claim
 spec:
-  accessModes: [ReadWriteMany]
+  accessModes: [ReadWriteOnce]
   resources:
     requests:
       storage: 10Gi
@@ -60,7 +60,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: penpot-persistance
 spec:
-  accessModes: [ReadWriteMany]
+  accessModes: [ReadWriteOnce]
   resources:
     requests:
       storage: 20Gi
