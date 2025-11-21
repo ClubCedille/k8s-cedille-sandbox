@@ -632,7 +632,7 @@ persistence:
     # If defined, storageClassName: <storageClass>.
     # If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner.
     # @section -- Persistence parameters
-    storageClass: "default"
+    storageClass: "local-path"
     # -- Penpot objects persistent Volume size.
     # @section -- Persistence parameters
     size: 20Gi
