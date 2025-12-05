@@ -1,0 +1,16 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgresql-outline
+spec:
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.2
+  instances: 1
+  bootstrap:
+    initdb:
+      database: outline
+      owner: outline
+      secret:
+        name: postgresql-outline-app
+  storage:
+    size: 15Gi
+    storageClass: local-path

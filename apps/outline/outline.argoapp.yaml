@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: outline-sandbox
+  namespace: argocd
+spec:
+  destination:
+    namespace: outline-sandbox
+    server: https://cedille.kubernetes.omni.siderolabs.io?cluster=k8s-cedille-sandbox
+  project: k8s-cedille-sandbox
+  source:
+    path: apps/outline/prod
+    repoURL: https://github.com/ClubCedille/k8s-cedille-sandbox.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
