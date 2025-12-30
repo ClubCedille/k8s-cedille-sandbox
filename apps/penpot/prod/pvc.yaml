@@ -11,29 +11,6 @@ spec:
   persistentVolumeReclaimPolicy: Delete
   storageClassName: local-path
   local:
-    path: /mnt/penpot/penpot-pv-data
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: disktype
-              operator: In
-              values:
-                - ssd
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: penpot-pv-claim
-spec:
-  capacity:
-    storage: 10Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Delete
-  storageClassName: local-path
-  local:
     path: /mnt/penpot/penpot-pv
   nodeAffinity:
     required:
@@ -43,17 +20,6 @@ spec:
               operator: In
               values:
                 - ssd
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: penpot-pv-claim
-spec:
-  accessModes: [ReadWriteOnce]
-  resources:
-    requests:
-      storage: 10Gi
-  storageClassName: local-path
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
