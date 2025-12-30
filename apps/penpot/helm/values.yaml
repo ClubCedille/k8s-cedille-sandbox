@@ -626,7 +626,7 @@ exporter:
 persistence:
   assets:
     enabled: true
-    storageClass: "default"
+    storageClass: "local-path"
     size: 10Gi
 
   exporter:
@@ -635,7 +635,7 @@ persistence:
     enabled: true
     # -- Exporter persistent Volume storage class. Empty is choosing the default provisioner by the provider.
     # @section -- Persistence parameters
-    storageClass: "default"
+    storageClass: "local-path"
     # -- Exporter persistent Volume size.
     # @section -- Persistence parameters
     size: 10Gi
