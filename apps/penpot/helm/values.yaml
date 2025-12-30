@@ -626,15 +626,16 @@ exporter:
 persistence:
   assets:
     enabled: true
-    existingClaim: "penpot-persistance"
+    storageClass: "default"
+    size: 10Gi
 
   exporter:
     # -- Enable exporter persistence using Persistent Volume Claims. If exporter.replicaCount you have to enable it.
     # @section -- Persistence parameters
-    enabled: false
+    enabled: true
     # -- Exporter persistent Volume storage class. Empty is choosing the default provisioner by the provider.
     # @section -- Persistence parameters
-    storageClass: ""
+    storageClass: "default"
     # -- Exporter persistent Volume size.
     # @section -- Persistence parameters
     size: 10Gi
