@@ -3,6 +3,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: penpot-data-assets
+  namespace: penpot
 spec:
   capacity:
     storage: 20Gi
@@ -11,12 +12,13 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-path
   hostPath:
-    path: /path/to/your/local/path/penpot-data-assets
+    path: /opt/data/assets
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: penpot-data-exporter
+  namespace: penpot
 spec:
   capacity:
     storage: 20Gi
@@ -25,4 +27,4 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-path
   hostPath:
-    path: /path/to/your/local/path/penpot-data-exporter
+    path: /opt/data/exporter
