@@ -1,0 +1,18 @@
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: gatus
+spec:
+  virtualhost:
+    fqdn: gatus.sandbox.cedille.club
+    tls:
+      secretName: tls-delegation/sandbox-tls
+  routes:
+    - conditions:
+        - prefix: /
+      services:
+        - name: gatus
+          port: 8080
+      timeoutPolicy:
+        idle: 600s
+        response: 600s
