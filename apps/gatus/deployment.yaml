@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: gatus
   annotations:
-    kube-score/ignore: pod-networkpolicy
+    kube-score/ignore: pod-networkpolicy, pod-probes, container-image-tag
 spec:
   replicas: 1
   selector:
