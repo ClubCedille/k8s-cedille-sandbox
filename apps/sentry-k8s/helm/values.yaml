@@ -7,11 +7,15 @@ sentry:
     # Si le pod db-check échoue trop vite, augmentez les retries ici
     # (selon les options disponibles dans votre version du chart)
 clickhouse:
+  enabled: false
   persistence:
     storageClass: "local-path-wait"
 
 kafka:
   config: "auto.create.topics.enable=true" # FAUX : c'est une string, pas une table
+  replicaCount: 1 # On passe de 3 à 1 pour la sandbox
+  zookeeper:
+    replicaCount: 1
 
 postgresql:
   enabled: true
@@ -27,8 +31,12 @@ postgresql:
   resources:
     requests:
       #cpu: 200m
-      #memory: 256Mi
+      #memory: 256Mi  
 redis:
+  replicaCount: 1
+  architecture: standalone
   master:
     persistence:
       storageClass: "local-path-wait"
+
+      
