@@ -1,0 +1,7 @@
+# This finds the namespace and name, then deletes it
+kubectl get pods -A | sls "local-path" | ForEach-Object { 
+    $parts = $_.ToString().Split(" ", [System.StringSplitOptions]::RemoveEmptyEntries)
+    kubectl delete pod $parts[1] -n $parts[0] 
+}
+
+

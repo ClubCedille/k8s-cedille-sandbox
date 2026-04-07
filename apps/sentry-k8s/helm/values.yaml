@@ -1,0 +1,34 @@
+# Exemple de contenu pour sentry-config.yaml
+sentry:
+  securityContext:
+    runAsUser: 10728
+  dbCheck:
+    enabled: true
+    # Si le pod db-check échoue trop vite, augmentez les retries ici
+    # (selon les options disponibles dans votre version du chart)
+clickhouse:
+  persistence:
+    storageClass: "local-path-wait"
+
+kafka:
+  config: "auto.create.topics.enable=true" # FAUX : c'est une string, pas une table
+
+postgresql:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: "Local-path-wait"
+  primary:
+    podSecurityContext:
+      fsGroup: 10728
+    containerSecurityContext:
+      runAsUser: 10728
+  resources:
+    requests:
+      #cpu: 200m
+      #memory: 256Mi
+redis:
+  master:
+    persistence:
+      storageClass: "local-path-wait"
