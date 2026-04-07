@@ -1,0 +1,234 @@
+user:
+  create: true
+  email: "civic-coke@outlook.com"
+  password: "--set" # À changer ou utiliser un secret K8s
+
+#Appliquer à TOUS les conteneurs gérés par le chart Sentry principal
+asRoot: false
+
+system:
+  secretKey : "test"
+
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+securitySettings: &security
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  readOnlyRootFilesystem: false # Sentry a besoin d'écrire des fichiers temporaires
+  capabilities:
+    drop: ["ALL"]
+  seccompProfile:
+    type: RuntimeDefault
+
+podSecurity: &podSecurity
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+# Paramètres par défaut pour tous les conteneurs
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+  capabilities:
+    drop: ["ALL"]
+
+ingress:
+  enabled: true
+  hostname: "sentry.sandbox.cedille.club"
+  annotations: {} # Ajoutez ici vos annotations cert-manager ou ingress class
+
+# Exemple pour le web, à ajuster pour worker/ingest
+sentry:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+
+# Applique ces droits au niveau global des pods Sentry
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000        # Important pour que Sentry puisse écrire dans les volumes
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+
+web:
+    containerSecurityContext: *security
+    podSecurityContext: *podSecurity
+    resources:
+      requests:
+        memory: "500Mi"
+        cpu: "300m"
+      limits:
+        memory: "1Gi"
+
+worker:
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+cron:
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    # This is the line required by the error:
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop:
+        - ALL
+hooks:
+  containerSecurityContext: *security
+  podSecurityContext: *podSecurity
+  dbCheck:
+    enabled: true # Vous pouvez mettre false si ça bloque encore
+    containerSecurityContext: *security
+  dbCheck:
+    enabled: false  # Désactive le job qui bloque tout
+  dbInit:
+    enabled: true   # Gardez celui-ci, il crée les tables
+  activeDeadlineSeconds: 300
+  shareProcessNamespace: false
+  # Forcer la sécurité sur les jobs de migration et de check
+  podSecurityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+  # This specifically targets the container-level restriction
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+      
+kafka:
+  # Décalé -> c'est une "table"
+  enabled: true
+  persistence:
+    enabled: false
+  config: |
+    num.partitions: 1
+    offsets.topic.replication.factor: 1
+    auto.create.topics.enable: "true" 
+  extraConfig: |
+    default.replication.factor=1
+    message.max.bytes=10485760
+    replica.fetch.max.bytes=10485760
+
+  # 1. Sécurité pour les brokers Kafka (StatefulSet)
+  podSecurityContext:
+    runAsUser: 1001
+    runAsGroup: 1001
+    fsGroup: 1001
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop: ["ALL"]
+
+  # 2. Sécurité pour le Job de provisioning (celui qui bloque)
+  provisioning:
+    podSecurityContext:
+      runAsUser: 1001
+      runAsGroup: 1001
+      fsGroup: 1001
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+      capabilities:
+        drop: ["ALL"]
+
+  # 3. Sécurité pour Zookeeper (Requis si vous n'êtes pas en mode KRaft)
+  zookeeper:
+    containerSecurityContext: *security
+    podSecurityContext: *podSecurity
+    podSecurityContext:
+      runAsUser: 1001
+      runAsGroup: 1001
+      fsGroup: 1001
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+      capabilities:
+        drop: ["ALL"]
+redis:
+  master:
+   # persistence:
+     # enabled : false
+    #replica:
+     # persistence:
+      #  enabled: false
+    containerSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+      allowPrivilegeEscalation: false
+
+postgresql:
+  primary:
+    #persistence:
+     # enabled: false
+    containerSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+      allowPrivilegeEscalation: false
+  containerSecurityContext: *security
+#INGRESS
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: gatus
+spec:
+  virtualhost:
+    fqdn: gatus.sandbox.cedille.club
+    tls:
+      secretName: tls-delegation/sandbox-tls
+  routes:
+    - conditions:
+        - prefix: /
+      services:
+        - name: gatus
+          port: 8080
+      timeoutPolicy:
+        idle: 600s
+        response: 600s
+#Relay taskbroker
+
+relay:
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop: ["ALL"]
+  podSecurityContext:
+    runAsUser: 1000
+    fsGroup: 1000
