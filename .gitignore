@@ -1,2 +1,7 @@
 /apps/**/charts
 *secret.yaml
+apps/sentry-k8s/.gitignore/commandes-PS-bash.txt
+apps/sentry-k8s/.gitignore/out.yaml
+apps/sentry-k8s/.gitignore/outTestDRY.yaml
+apps/sentry-k8s/.gitignore/sentry-values - Copy.yaml
+apps/sentry-k8s/.gitignore/sentry-values.yaml
