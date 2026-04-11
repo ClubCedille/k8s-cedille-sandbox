@@ -38,5 +38,3 @@ redis:
   master:
     persistence:
       storageClass: "local-path-wait"
-
-      
