@@ -9,4 +9,4 @@ on:
 jobs:
   kubernetes-repo-standards:
     uses:
-      clubcedille/cedille-workflows/.github/workflows/kubernetes-repo-standards.yml@master
+      clubcedille/cedille-workflows/.github/workflows/kubernetes-repo-standards.yml@feat/kubeconform-pluto-validation
