@@ -5,9 +5,9 @@ global:
   # -- The edition of the application, SELF_HOSTED or CLOUD
   edition: "SELF_HOSTED"
   # -- A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-  appSecretKey: "I5UZ19sEIcwzrbTomTUVfJGZordr88I+0Gx2xYWEnRWu4vk+R8mKTXnW" # vault-secret for prod
+  appSecretKey: "#REPLACE_ME#" # vault-secret for prod
   # -- secret key for inner api calls. You can generate a strong key using `openssl rand -base64 42`.
-  innerApiKey: "DeA+iDHZ2DpmE1gGMCHk0Bi1bKdge7gkjnvCdyRrWssxTKriRnO+/O/c"
+  innerApiKey: "#REPLACE_ME#"
   useTLS: true
   # -- External port for accessing services (default: 80).
   # Browser uses port 443 for HTTPS (useTLS: true) unless explicitly overridden.
@@ -15,27 +15,27 @@ global:
   externalPort: 443
   # -- The backend domain of the console API, used to concatenate the authorization callback.
   # If empty, it is the same domain. Example: console.dify.ai
-  consoleApiDomain: ""
+  consoleApiDomain: "dify.sandbox.cedille.club"
   # -- The front-end domain of the console web, used to concatenate some front-end addresses and for CORS configuration use.
   # If empty, it is the same domain. Example: console.dify.ai
-  consoleWebDomain: ""
+  consoleWebDomain: "dify.sandbox.cedille.club"
   # -- Service API domain, used to display Service API Base Url to the front-end.
   # If empty, it is the same domain. Example: api.dify.ai
-  serviceApiDomain: ""
+  serviceApiDomain: "dify.sandbox.cedille.club"
   # -- WebApp API backend domain, used to declare the back-end URL for the front-end API.
   # If empty, it is the same domain. Example: app.dify.ai
-  appApiDomain: ""
+  appApiDomain: "dify.sandbox.cedille.club"
   # -- WebApp domain, used to display WebAPP API Base Url to the front-end. If empty, it is the same domain. Example: app.dify.ai
-  appWebDomain: ""
+  appWebDomain: "dify.sandbox.cedille.club"
   # -- File preview or download domain, used to display the file preview
   # or download URL to the front-end or as a multi-modal model input;
   # In order to prevent others from forging, the image preview URL is signed and has a 5-minute expiration time.
-  filesDomain: ""
+  filesDomain: "dify.sandbox.cedille.club"
   # -- Enterprise service domain, used to declare the back-end URL for the front-end API.
   enterpriseDomain: ""
   # -- Trigger service domain, used by API and workers for trigger functionality.
   # If empty, trigger functionality may not work properly. Example: trigger.dify.ai
-  triggerDomain: ""
+  triggerDomain: "dify.sandbox.cedille.club"
   # -- This is useful if plugins are installed in a different cluster.
   # If left empty, internal service domain will be used.
   pluginDaemonDomain: ""
@@ -82,7 +82,7 @@ global:
     remoteKey: "dify"
   otel:
     # -- Requires enterpriseCollector.enabled to be true
-    enabled: true
+    enabled: false
     # -- Sampling rate (0.0 to 1.0, empty means default)
     samplingRate: "0.2"
     # -- Batch export schedule delay in milliseconds
@@ -896,7 +896,7 @@ agentRuntime:
 
 enterprise:
   # -- Enable this component
-  enabled: true
+  enabled: false
   # -- Container image configuration
   image:
     # -- g-hsod9681-docker.pkg.coding.net/dify-artifact/dify/dify-enterprise
@@ -979,7 +979,7 @@ enterprise:
 
 enterpriseCollector:
   # -- Enable this component
-  enabled: true
+  enabled: false
   # -- Container image configuration
   image:
     # -- Container image repository
@@ -1021,7 +1021,7 @@ enterpriseCollector:
       size: 256
 enterpriseAudit:
   # -- Enable this component
-  enabled: true
+  enabled: false
   # -- Container image configuration
   image:
     # -- g-hsod9681-docker.pkg.coding.net/dify-artifact/dify/dify-audit
@@ -1092,7 +1092,7 @@ enterpriseAudit:
 
 enterpriseFrontend:
   # -- Enable this component
-  enabled: true
+  enabled: false
   # -- Container image configuration
   image:
     # -- g-hsod9681-docker.pkg.coding.net/dify-artifact/dify/dify-enterprise-frontend
@@ -1335,7 +1335,7 @@ plugin_controller:
 
 enterpriseRbac:
   # -- Enable this component
-  enabled: true
+  enabled: false
   # -- https://github.com/langgenius/dify-enterprise/releases/tag/0.14.4
   image:
     # -- g-hsod9681-docker.pkg.coding.net/dify-artifact/dify/enterprise_rbac
