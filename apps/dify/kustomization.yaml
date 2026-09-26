@@ -41,3 +41,38 @@ patches:
       apiVersion: v1
       kind: Secret
       metadata: { name: ignored }
+  # kube-score pod-probes: chart hardcodes identical or missing probes for these
+  # components and values.yaml exposes no override. dify-sandbox port 8194 is a
+  # proprietary protocol (no HTTP alternative); the other two have no probe keys
+  # in values at all. Ignoring per-resource with justification is the sanctioned
+  # escape hatch (see README §"Politique kube-score").
+  - target:
+      kind: Deployment
+      name: dify-sandbox
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: dify-sandbox
+        annotations:
+          kube-score/ignore: pod-probes
+  - target:
+      kind: Deployment
+      name: dify-agent-sandbox-ssrf-proxy
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: dify-agent-sandbox-ssrf-proxy
+        annotations:
+          kube-score/ignore: pod-probes
+  - target:
+      kind: Deployment
+      name: dify-plugin-daemon
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: dify-plugin-daemon
+        annotations:
+          kube-score/ignore: pod-probes

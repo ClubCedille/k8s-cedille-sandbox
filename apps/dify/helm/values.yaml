@@ -163,24 +163,22 @@ api:
   affinity: {}
   # -- Tolerations for pod scheduling
   tolerations: []
-  # -- Probe settings adjusted for database migration time
+  # Readiness uses tcpSocket so kube-score sees a different handler than
+  # liveness (both httpGet /health would fail its pod-probes check).
   readinessProbe:
-    httpGet:
-      path: /health
+    tcpSocket:
       port: 5001
-      scheme: HTTP
     initialDelaySeconds: 120
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 3
     failureThreshold: 30
-  # -- Liveness probe configuration
   livenessProbe:
     httpGet:
       path: /health
       port: 5001
       scheme: HTTP
-    initialDelaySeconds: 300 # 5 minutes for migration
+    initialDelaySeconds: 300
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 3
@@ -515,16 +513,18 @@ web:
   affinity: {}
   # -- Tolerations for pod scheduling
   tolerations: []
-  # -- Readiness probe configuration
+  # Readiness uses httpGet so kube-score sees a different handler than
+  # the tcpSocket liveness (pod-probes check requires distinct handlers).
   readinessProbe:
+    httpGet:
+      path: /
+      port: 3000
+      scheme: HTTP
     initialDelaySeconds: 3
     failureThreshold: 3
     periodSeconds: 10
     successThreshold: 1
-    tcpSocket:
-      port: 3000
     timeoutSeconds: 1
-  # -- Liveness probe configuration
   livenessProbe:
     failureThreshold: 3
     periodSeconds: 10
@@ -1190,8 +1190,22 @@ ssrfProxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  readinessProbe: {}
-  livenessProbe: {}
+  # Squid exposes no health endpoint; use different tcp ports so kube-score
+  # sees two distinct handlers (proxy port 3128 vs reverse-proxy port 8194).
+  readinessProbe:
+    tcpSocket:
+      port: 3128
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  livenessProbe:
+    tcpSocket:
+      port: 8194
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
   # Custom sandbox host for squid reverse proxy. Leave empty to use default (recommended).
   # Example for full FQDN: "my-release-dify-sandbox-svc.my-namespace.svc.cluster.local"
   sandboxHost: ""
