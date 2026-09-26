@@ -888,7 +888,7 @@ agentRuntime:
     successThreshold: 1
     httpGet:
       path: /healthz
-      port: 5004
+      port: 5005
     timeoutSeconds: 3
   # -- Extra environment variables
   extraEnv: []
