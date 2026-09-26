@@ -5,7 +5,7 @@ global:
   # -- The edition of the application, SELF_HOSTED or CLOUD
   edition: "SELF_HOSTED"
   # -- A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-  appSecretKey: "#REPLACE_ME#" # vault-secret for prod
+  appSecretKey: "#REPLACE_ME#"  # vault-secret for prod
   # -- secret key for inner api calls. You can generate a strong key using `openssl rand -base64 42`.
   innerApiKey: "#REPLACE_ME#"
   useTLS: true
@@ -140,7 +140,7 @@ ingress:
   className: ""
   # -- Custom annotations
   annotations: {}
-    # -- kubernetes.io/tls-acme: "true"
+  # -- kubernetes.io/tls-acme: "true"
   tls: []
 
 api:
@@ -163,22 +163,24 @@ api:
   affinity: {}
   # -- Tolerations for pod scheduling
   tolerations: []
-  # Readiness uses tcpSocket so kube-score sees a different handler than
-  # liveness (both httpGet /health would fail its pod-probes check).
+  # -- Probe settings adjusted for database migration time
   readinessProbe:
-    tcpSocket:
+    httpGet:
+      path: /health
       port: 5001
+      scheme: HTTP
     initialDelaySeconds: 120
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 3
     failureThreshold: 30
+  # -- Liveness probe configuration
   livenessProbe:
     httpGet:
       path: /health
       port: 5001
       scheme: HTTP
-    initialDelaySeconds: 300
+    initialDelaySeconds: 300 # 5 minutes for migration
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 3
@@ -513,18 +515,16 @@ web:
   affinity: {}
   # -- Tolerations for pod scheduling
   tolerations: []
-  # Readiness uses httpGet so kube-score sees a different handler than
-  # the tcpSocket liveness (pod-probes check requires distinct handlers).
+  # -- Readiness probe configuration
   readinessProbe:
-    httpGet:
-      path: /
-      port: 3000
-      scheme: HTTP
     initialDelaySeconds: 3
     failureThreshold: 3
     periodSeconds: 10
     successThreshold: 1
+    tcpSocket:
+      port: 3000
     timeoutSeconds: 1
+  # -- Liveness probe configuration
   livenessProbe:
     failureThreshold: 3
     periodSeconds: 10
@@ -1069,7 +1069,7 @@ enterpriseAudit:
 
   scheduler:
     # -- Cron expression for solidify check
-    solidifyCheckCron: "0 0 */1 * *" # minutes hours day-of-month month day-of-week
+    solidifyCheckCron: "0 0 */1 * *"  # minutes hours day-of-month month day-of-week
     # -- Delay in days before solidifying audit logs
     solidifyDelayDays: 90
     # -- Timeout in seconds
@@ -1685,7 +1685,7 @@ mail:
   defaultSender: "YOUR EMAIL FROM (eg: no-reply <no-reply@dify.ai>)"
   # -- the api-key for resend (https://resend.com)
   resend:
-      # -- Resend API key (https://resend.com)
+    # -- Resend API key (https://resend.com)
     apiKey: ""
     apiUrl: https://api.resend.com
   smtp:
@@ -1799,12 +1799,12 @@ externalRedis:
   sentinel:
     # -- Enable this component
     enabled: false
-    nodes: "" # Comma-separated list of Redis Sentinel nodes (host:port)
-    serviceName: "" # Name of the Redis Sentinel service to monitor
+    nodes: ""  # Comma-separated list of Redis Sentinel nodes (host:port)
+    serviceName: ""  # Name of the Redis Sentinel service to monitor
     username: ""
     # -- Redis password
     password: "#REPLACE_ME#"
-    socketTimeout: 0.1 # Socket timeout in seconds for Redis Sentinel connections
+    socketTimeout: 0.1  # Socket timeout in seconds for Redis Sentinel connections
 
   # -- Event Bus — community-only API ↔ worker pub/sub stream. Set `url`
   # to point the Event Bus at a separate Redis (typically a Redis
@@ -1818,8 +1818,8 @@ externalRedis:
   # worker-beat / additional-worker / plugin-daemon extraEnv:
   # EVENT_BUS_REDIS_CHANNEL_TYPE=sharded
   eventBus:
-    url: "" # e.g. redis://cluster-seed:7001/0
-    useClusters: false # set true when `url` points at a Redis Cluster
+    url: ""  # e.g. redis://cluster-seed:7001/0
+    useClusters: false  # set true when `url` points at a Redis Cluster
 
 redis:
   # -- Enable this component
@@ -1984,4 +1984,4 @@ externalPrometheus:
 externalKubernetes:
   # -- Enable this component
   enabled: false
-
+  
