@@ -1190,22 +1190,8 @@ ssrfProxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  # Squid exposes no health endpoint; use different tcp ports so kube-score
-  # sees two distinct handlers (proxy port 3128 vs reverse-proxy port 8194).
-  readinessProbe:
-    tcpSocket:
-      port: 3128
-    initialDelaySeconds: 5
-    periodSeconds: 10
-    timeoutSeconds: 3
-    failureThreshold: 3
-  livenessProbe:
-    tcpSocket:
-      port: 8194
-    initialDelaySeconds: 10
-    periodSeconds: 10
-    timeoutSeconds: 3
-    failureThreshold: 3
+  readinessProbe: {}
+  livenessProbe: {}
   # Custom sandbox host for squid reverse proxy. Leave empty to use default (recommended).
   # Example for full FQDN: "my-release-dify-sandbox-svc.my-namespace.svc.cluster.local"
   sandboxHost: ""
@@ -1984,4 +1970,3 @@ externalPrometheus:
 externalKubernetes:
   # -- Enable this component
   enabled: false
-  

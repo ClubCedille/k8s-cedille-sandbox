@@ -1,7 +1,7 @@
-gateway:        { enabled: false }
-agentBackend:   { enabled: false }
-agentRuntime:   { enabled: false }
-unstructured:   { enabled: false }
+gateway: {enabled: false}
+agentBackend: {enabled: false}
+agentRuntime: {enabled: false}
+unstructured: {enabled: false}
 persistence:
   type: local
   local:
