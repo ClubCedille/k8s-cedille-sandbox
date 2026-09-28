@@ -32,6 +32,18 @@ patches:
       apiVersion: apiextensions.k8s.io/v1
       kind: CustomResourceDefinition
       metadata: { name: ignored }
+  # Probes are hardcoded in the chart (TCP 3128 for both) and squid has no HTTP
+  # health endpoint, so skip kube-score's identical-probe check here
+  - target:
+      kind: Deployment
+      name: dify-agent-sandbox-ssrf-proxy
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: dify-agent-sandbox-ssrf-proxy
+        annotations:
+          kube-score/ignore: pod-probes-identical
   # Secrets holding passwords/keys come from Vault instead (prod/vault.yaml)
   - target:
       kind: Secret
