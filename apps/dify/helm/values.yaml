@@ -189,7 +189,7 @@ api:
     httpGet: null
     tcpSocket:
       port: 5001
-    initialDelaySeconds: 300 # 5 minutes for migration
+    initialDelaySeconds: 300  # 5 minutes for migration
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 3
