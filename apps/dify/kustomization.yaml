@@ -44,6 +44,33 @@ patches:
         name: dify-agent-sandbox-ssrf-proxy
         annotations:
           kube-score/ignore: pod-probes-identical
+  # The chart has no probe settings for the plugin daemon
+  - target:
+      kind: Deployment
+      name: dify-plugin-daemon
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: dify-plugin-daemon
+      spec:
+        template:
+          spec:
+            containers:
+              - name: dify-plugin-daemon
+                readinessProbe:
+                  httpGet:
+                    path: /health/check
+                    port: 5002
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  timeoutSeconds: 3
+                livenessProbe:
+                  tcpSocket:
+                    port: 5002
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 3
   # Secrets holding passwords/keys come from Vault instead (prod/vault.yaml)
   - target:
       kind: Secret

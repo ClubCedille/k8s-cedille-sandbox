@@ -1199,7 +1199,13 @@ ssrfProxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  readinessProbe: {}
+  # No liveness probe: squid only exposes a TCP port, and the same TCP check
+  # for both would trip kube-score's identical-probe check
+  readinessProbe:
+    tcpSocket:
+      port: 3128
+    initialDelaySeconds: 5
+    periodSeconds: 10
   livenessProbe: {}
   # Custom sandbox host for squid reverse proxy. Leave empty to use default (recommended).
   # Example for full FQDN: "my-release-dify-sandbox-svc.my-namespace.svc.cluster.local"
