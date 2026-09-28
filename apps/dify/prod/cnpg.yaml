@@ -1,0 +1,29 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cnpg
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17-standard-bookworm
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  bootstrap:
+    initdb:
+      database: dify
+      owner: dify
+      secret:
+        name: dify-secret
+      postInitSQL:
+        - CREATE DATABASE dify_plugin_daemon OWNER dify;
+      postInitApplicationSQL:
+        - CREATE EXTENSION IF NOT EXISTS vector;
+  storage:
+    size: 5Gi
+    storageClass: cephfs
+  postgresql:
+    parameters:
+      max_connections: "200"

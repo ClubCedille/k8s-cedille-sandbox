@@ -1,0 +1,37 @@
+gateway: {enabled: false}
+agentBackend: {enabled: false}
+agentRuntime: {enabled: false}
+unstructured: {enabled: false}
+persistence:
+  type: local
+  local:
+    persistentVolumeClaim:
+      existingClaim: dify-backend-pvc
+externalDatabase:
+  enabled: true
+  engine: postgres
+  host: cnpg-rw
+  port: 5432
+  user: dify
+  password: "#REPLACE_ME#"
+  dialectOptions:
+    postgres:
+      sslMode: disable
+externalRedis:
+  enabled: false
+redis:
+  enabled: true
+  architecture: standalone
+  master:
+    persistence:
+      storageClass: cephfs
+      size: 2Gi
+vectorDB:
+  useExternal: true
+  externalType: pgvector
+  externalPgvector:
+    host: cnpg-rw
+    port: 5432
+    user: dify
+    password: "#REPLACE_ME#"
+    database: dify
