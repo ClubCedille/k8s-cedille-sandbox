@@ -154,7 +154,15 @@ api:
     tag: "3.12.1"
   replicas: 1
   # -- Resource requests and limits
-  resources: {}
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+      ephemeral-storage: 1Gi
+    limits:
+      cpu: "1"
+      memory: 2Gi
+      ephemeral-storage: 2Gi
   # -- Service account name
   serviceAccountName: ""
   # -- Node selector for pod scheduling
@@ -306,7 +314,15 @@ worker:
     tag: "3.12.1"
   replicas: 1
   # -- Resource requests and limits
-  resources: {}
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+      ephemeral-storage: 1Gi
+    limits:
+      cpu: "1"
+      memory: 2Gi
+      ephemeral-storage: 2Gi
   # -- Service account name
   serviceAccountName: ""
   # -- Node selector for pod scheduling
@@ -432,7 +448,15 @@ additionalWorkers:
     # -- Number of Celery worker processes
     celeryWorkerAmount: 1
     # -- Resource requests and limits
-    resources: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+        ephemeral-storage: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+        ephemeral-storage: 1Gi
     # -- Node selector for pod scheduling
     nodeSelector: {}
     # -- Affinity rules for pod scheduling
@@ -451,7 +475,15 @@ workerBeat:
     repository: langgenius/dify-ee-api
     # override appVersion in Chart.yaml if not empty
     tag: "3.12.1"
-  resources: {}
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+      ephemeral-storage: 512Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
+      ephemeral-storage: 1Gi
   # -- Service account name
   serviceAccountName: ""
   # -- Node selector for pod scheduling
@@ -507,7 +539,15 @@ web:
   # -- Number of replicas
   replicas: 1
   # -- Resource requests and limits
-  resources: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+      ephemeral-storage: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+      ephemeral-storage: 1Gi
   # -- Service account name
   serviceAccountName: ""
   # -- Node selector for pod scheduling
@@ -618,7 +658,15 @@ sandbox:
     tag: "3.12.1"
   replicas: 1
   # -- Resource requests and limits
-  resources: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+      ephemeral-storage: 512Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+      ephemeral-storage: 1Gi
   # -- Service account name
   serviceAccountName: ""
   # -- Node selector for pod scheduling
@@ -643,7 +691,9 @@ sandbox:
   #     add: ["SYS_CHROOT"]
   #   seccompProfile:
   #     type: RuntimeDefault
-  securityContext: {}
+  # Stays root (needed for chroot), see kube-score ignores in kustomization.yaml
+  securityContext:
+    allowPrivilegeEscalation: false
   # -- Pod-level securityContext for the sandbox pod.
   # @raw
   # podSecurityContext:
@@ -834,14 +884,17 @@ sandboxGateway:
     replicas: 1
     image:
       repository: ubuntu/squid
-      tag: latest
+      # pinned (same as ssrfProxy) so kube-score doesn't flag the latest tag
+      tag: "6.13-25.04_beta"
     resources:
       requests:
         cpu: 50m
         memory: 128Mi
+        ephemeral-storage: 256Mi
       limits:
         cpu: 200m
         memory: 256Mi
+        ephemeral-storage: 512Mi
     # -- Squid configuration for the sandbox gateway SSRF proxy
     squidConf: |
       include /etc/squid/common/common.conf
@@ -1194,7 +1247,15 @@ ssrfProxy:
     repository: ubuntu/squid
     tag: "6.13-25.04_beta"
   replicas: 1
-  resources: {}
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+      ephemeral-storage: 256Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+      ephemeral-storage: 512Mi
   serviceAccountName: ""
   nodeSelector: {}
   affinity: {}
@@ -1298,7 +1359,15 @@ plugin_daemon:
     # -- g-hsod9681-docker.pkg.coding.net/dify-artifact/dify/dify-plugin-daemon
     repository: langgenius/dify-ee-plugin-daemon-serverless
     tag: 3.12.1
-  resources: {}
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+      ephemeral-storage: 1Gi
+    limits:
+      cpu: "1"
+      memory: 2Gi
+      ephemeral-storage: 4Gi
   # -- Node selector for pod scheduling
   nodeSelector: {}
   # -- Affinity rules for pod scheduling
@@ -1832,6 +1901,27 @@ redis:
     registry: docker.io
     # -- Image tag (overrides appVersion if non-empty)
     tag: 6.2.16-debian-12-r3
+    pullPolicy: Always
+  master:
+    # UID/GID >= 10000 for kube-score; fsGroup makes the PVC writable for it
+    podSecurityContext:
+      enabled: true
+      fsGroup: 10001
+    containerSecurityContext:
+      enabled: true
+      runAsUser: 10001
+      runAsGroup: 10001
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+        ephemeral-storage: 256Mi
+      limits:
+        cpu: 250m
+        memory: 256Mi
+        ephemeral-storage: 512Mi
   global:
     redis:
       # -- Redis password
