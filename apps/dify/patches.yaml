@@ -8,7 +8,7 @@
 #     starts as root and drops to its own user
 #
 # App pods run as UID/GID 10001 (>= 10000 for kube-score); fsGroup makes the
-# shared app-data PVC writable for that user.
+# shared app-data PVC writable for that user. Except worker-beat (see below).
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -43,12 +43,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dify-worker-beat
+  # Keeps the image's own user: celery beat writes celerybeat-schedule into the
+  # image's working directory, which UID 10001 can't write to
   annotations:
-    kube-score/ignore: container-security-context-readonlyrootfilesystem
+    kube-score/ignore: container-security-context-readonlyrootfilesystem, container-security-context-user-group-id
 spec:
   template:
     spec:
-      securityContext: {runAsUser: 10001, runAsGroup: 10001, runAsNonRoot: true, fsGroup: 10001, fsGroupChangePolicy: OnRootMismatch}
       containers:
         - name: dify-worker-beat
           imagePullPolicy: Always
