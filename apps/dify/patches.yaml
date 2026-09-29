@@ -1,0 +1,197 @@
+# Fixes for what the dify chart can't set through values, one patch per workload:
+# - imagePullPolicy: Always (the chart hardcodes IfNotPresent)
+# - security contexts (the chart has no setting for most workloads)
+# - probes for plugin-daemon / plugin-connector (no setting in the chart)
+# - kube-score/ignore for checks skipped on purpose:
+#   - container-security-context-readonlyrootfilesystem: the images write to their filesystem
+#   - container-security-context-user-group-id: sandbox needs root for chroot, squid
+#     starts as root and drops to its own user
+#
+# App pods run as UID/GID 10001 (>= 10000 for kube-score); fsGroup makes the
+# shared app-data PVC writable for that user.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dify-api
+  annotations:
+    kube-score/ignore: container-security-context-readonlyrootfilesystem
+spec:
+  template:
+    spec:
+      securityContext: {runAsUser: 10001, runAsGroup: 10001, runAsNonRoot: true, fsGroup: 10001, fsGroupChangePolicy: OnRootMismatch}
+      containers:
+        - name: dify-api
+          imagePullPolicy: Always
+          securityContext: {allowPrivilegeEscalation: false}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dify-worker
+  annotations:
+    kube-score/ignore: container-security-context-readonlyrootfilesystem
+spec:
+  template:
+    spec:
+      securityContext: {runAsUser: 10001, runAsGroup: 10001, runAsNonRoot: true, fsGroup: 10001, fsGroupChangePolicy: OnRootMismatch}
+      containers:
+        - name: dify-worker
+          imagePullPolicy: Always
+          securityContext: {allowPrivilegeEscalation: false}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dify-worker-beat
+  annotations:
+    kube-score/ignore: container-security-context-readonlyrootfilesystem
+spec:
+  template:
+    spec:
+      securityContext: {runAsUser: 10001, runAsGroup: 10001, runAsNonRoot: true, fsGroup: 10001, fsGroupChangePolicy: OnRootMismatch}
+      containers:
+        - name: dify-worker-beat
+          imagePullPolicy: Always
+          securityContext: {allowPrivilegeEscalation: false}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dify-trigger-worker
+  annotations:
+    kube-score/ignore: container-security-context-readonlyrootfilesystem
+spec:
+  template:
+    spec:
+      securityContext: {runAsUser: 10001, runAsGroup: 10001, runAsNonRoot: true, fsGroup: 10001, fsGroupChangePolicy: OnRootMismatch}
+      containers:
+        - name: dify-trigger-worker
+          imagePullPolicy: Always
+          securityContext: {allowPrivilegeEscalation: false}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dify-web
+  annotations:
+    kube-score/ignore: container-security-context-readonlyrootfilesystem
+spec:
+  template:
+    spec:
+      securityContext: {runAsUser: 10001, runAsGroup: 10001, runAsNonRoot: true, fsGroup: 10001, fsGroupChangePolicy: OnRootMismatch}
+      containers:
+        - name: dify-web
+          imagePullPolicy: Always
+          securityContext: {allowPrivilegeEscalation: false}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dify-plugin-daemon
+  annotations:
+    kube-score/ignore: container-security-context-readonlyrootfilesystem
+spec:
+  template:
+    spec:
+      securityContext: {runAsUser: 10001, runAsGroup: 10001, runAsNonRoot: true, fsGroup: 10001, fsGroupChangePolicy: OnRootMismatch}
+      containers:
+        - name: dify-plugin-daemon
+          imagePullPolicy: Always
+          securityContext: {allowPrivilegeEscalation: false}
+          readinessProbe:
+            httpGet: {path: /health/check, port: 5002}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            tcpSocket: {port: 5002}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dify-plugin-connector
+  # the chart sets the namespace on this one
+  namespace: dify
+  annotations:
+    kube-score/ignore: container-security-context-readonlyrootfilesystem
+spec:
+  template:
+    spec:
+      securityContext: {runAsUser: 10001, runAsGroup: 10001, runAsNonRoot: true, fsGroup: 10001, fsGroupChangePolicy: OnRootMismatch}
+      containers:
+        - name: dify-plugin-connector
+          imagePullPolicy: Always
+          securityContext: {allowPrivilegeEscalation: false}
+          # No known HTTP health endpoint, so TCP readiness only (a TCP liveness
+          # probe too would trip kube-score's identical-probe check)
+          readinessProbe:
+            tcpSocket: {port: 5004}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+# Standard controller-manager image: runs fine as non-root with a read-only
+# filesystem (the chart already drops all capabilities)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dify-crd-controller
+  # the chart sets the namespace on this one
+  namespace: dify
+spec:
+  template:
+    spec:
+      containers:
+        - name: manager
+          imagePullPolicy: Always
+          securityContext:
+            runAsUser: 65532
+            runAsGroup: 65532
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dify-sandbox
+  annotations:
+    kube-score/ignore: container-security-context-readonlyrootfilesystem, container-security-context-user-group-id
+spec:
+  template:
+    spec:
+      containers:
+        - name: dify-sandbox
+          imagePullPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dify-ssrf-proxy
+  annotations:
+    kube-score/ignore: container-security-context-readonlyrootfilesystem, container-security-context-user-group-id
+spec:
+  template:
+    spec:
+      containers:
+        - name: dify-ssrf-proxy
+          imagePullPolicy: Always
+          securityContext: {allowPrivilegeEscalation: false}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dify-agent-sandbox-ssrf-proxy
+  annotations:
+    kube-score/ignore: container-security-context-readonlyrootfilesystem, container-security-context-user-group-id
+spec:
+  template:
+    spec:
+      containers:
+        - name: sandbox-ssrf-proxy
+          imagePullPolicy: Always
+          securityContext: {allowPrivilegeEscalation: false}
+          # The chart hardcodes TCP 3128 for both probes; drop liveness (same as
+          # ssrfProxy) so kube-score doesn't flag them as identical
+          livenessProbe: null

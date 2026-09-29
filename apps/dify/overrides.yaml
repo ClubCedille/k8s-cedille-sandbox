@@ -2,6 +2,8 @@ gateway: {enabled: false}
 agentBackend: {enabled: false}
 agentRuntime: {enabled: false}
 unstructured: {enabled: false}
+# Enterprise plugin manager (the rest of the enterprise components are off in helm/values.yaml)
+plugin_manager: {enabled: false}
 persistence:
   type: local
   local:
@@ -22,6 +24,10 @@ externalRedis:
 redis:
   enabled: true
   architecture: standalone
+  # Password from Vault (prod/vault.yaml); the subchart then creates no Secret
+  auth:
+    existingSecret: dify-vault-redis
+    existingSecretPasswordKey: REDIS_PASSWORD
   master:
     persistence:
       storageClass: cephfs

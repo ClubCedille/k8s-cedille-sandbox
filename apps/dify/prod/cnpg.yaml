@@ -16,7 +16,7 @@ spec:
       database: dify
       owner: dify
       secret:
-        name: dify-secret
+        name: dify-vault-db
       postInitSQL:
         - CREATE DATABASE dify_plugin_daemon OWNER dify;
       postInitApplicationSQL:

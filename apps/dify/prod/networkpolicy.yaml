@@ -1,0 +1,167 @@
+# NetworkPolicies for the dify chart's workloads. Ingress is limited to each
+# workload's own port; internal-only services only accept dify pods. CNPG pods
+# aren't selected, so the CNPG operator keeps full access to them.
+# The chart also ships dify-sandbox-egress (sandbox egress: DNS + ssrf-proxy only).
+
+# Public entry points (Contour and other dify pods)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dify-api
+spec:
+  podSelector:
+    matchLabels:
+      app: dify-api
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - port: 5001
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dify-web
+spec:
+  podSelector:
+    matchLabels:
+      app: dify-web
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - port: 3000
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dify-plugin-daemon
+spec:
+  podSelector:
+    matchLabels:
+      app: dify-plugin-daemon
+  policyTypes:
+    - Ingress
+  ingress:
+    # 5002: API (and /e endpoints via the ingress); 5003: remote plugin debugging (NodePort)
+    - ports:
+        - port: 5002
+          protocol: TCP
+        - port: 5003
+          protocol: TCP
+---
+# Internal services: only reachable from other dify pods
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dify-sandbox
+spec:
+  podSelector:
+    matchLabels:
+      app: dify-sandbox
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: dify
+      ports:
+        - port: 8194
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dify-ssrf-proxy
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values: [dify-ssrf-proxy, dify-agent-sandbox-ssrf-proxy]
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: dify
+      ports:
+        - port: 3128
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dify-plugin-connector
+spec:
+  podSelector:
+    matchLabels:
+      app: dify-plugin-connector
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: dify
+      ports:
+        - port: 5004
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dify-redis
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: dify
+      app.kubernetes.io/name: redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: dify
+      ports:
+        - port: 6379
+          protocol: TCP
+---
+# Workers and the CRD controller serve nothing: deny all ingress
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dify-no-ingress
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values: [dify-worker, dify-worker-beat, dify-trigger-worker, dify-crd]
+  policyTypes:
+    - Ingress
+---
+# Egress stays open on purpose: model providers, the plugin marketplace, Postgres,
+# DNS and (for crd-controller/plugin-connector) the Kubernetes API.
+# Sandbox is excluded so the chart's dify-sandbox-egress restriction still applies.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dify-egress
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: dify
+    matchExpressions:
+      - key: app
+        operator: NotIn
+        values: [dify-sandbox]
+  policyTypes:
+    - Egress
+  egress:
+    - {}
