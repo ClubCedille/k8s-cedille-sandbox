@@ -1,0 +1,156 @@
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: dify-auth
+spec:
+  method: kubernetes
+  mount: kubernetes
+  kubernetes:
+    audiences:
+      - vault
+    role: secret-reader
+    serviceAccount: default
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-secret
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-secret
+  destination:
+    name: dify-secret
+    create: true
+    type: kubernetes.io/basic-auth
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-redis
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-redis
+  destination:
+    name: dify-redis
+    create: true
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-api-secret
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-api-secret
+  destination:
+    name: dify-api-secret
+    create: true
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-worker-secret
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-worker-secret
+  destination:
+    name: dify-worker-secret
+    create: true
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-worker-beat-secret
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-worker-beat-secret
+  destination:
+    name: dify-worker-beat-secret
+    create: true
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-sandbox-secret
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-sandbox-secret
+  destination:
+    name: dify-sandbox-secret
+    create: true
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-plugin-daemon-secret
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-plugin-daemon-secret
+  destination:
+    name: dify-plugin-daemon-secret
+    create: true
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-shared-db-secret
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-shared-db-secret
+  destination:
+    name: dify-shared-db-secret
+    create: true
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-shared-redis-secret
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-shared-redis-secret
+  destination:
+    name: dify-shared-redis-secret
+    create: true
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-shared-celery-secret
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-shared-celery-secret
+  destination:
+    name: dify-shared-celery-secret
+    create: true
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-shared-vectordb-secret
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-shared-vectordb-secret
+  destination:
+    name: dify-shared-vectordb-secret
+    create: true

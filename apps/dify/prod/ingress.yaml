@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dify
+  annotations:
+    projectcontour.io/response-timeout: "600s"
+spec:
+  ingressClassName: contour
+  tls:
+    - hosts:
+        - dify.sandbox.cedille.club
+      secretName: tls-delegation/sandbox-tls
+  rules:
+    - host: dify.sandbox.cedille.club
+      http:
+        paths:
+          - {path: /console/api, pathType: Prefix, backend: {service: {name: dify-api-svc, port: {number: 5001}}}}
+          - {path: /api, pathType: Prefix, backend: {service: {name: dify-api-svc, port: {number: 5001}}}}
+          - {path: /v1, pathType: Prefix, backend: {service: {name: dify-api-svc, port: {number: 5001}}}}
+          - {path: /files, pathType: Prefix, backend: {service: {name: dify-api-svc, port: {number: 5001}}}}
+          - {path: /e, pathType: Prefix, backend: {service: {name: dify-plugin-daemon-svc, port: {number: 5002}}}}
+          - {path: /, pathType: Prefix, backend: {service: {name: dify-web-svc, port: {number: 3000}}}}
