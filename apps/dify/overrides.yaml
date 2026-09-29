@@ -24,6 +24,10 @@ externalRedis:
 redis:
   enabled: true
   architecture: standalone
+  # Password from Vault (prod/vault.yaml); the subchart then creates no Secret
+  auth:
+    existingSecret: dify-vault-redis
+    existingSecretPasswordKey: REDIS_PASSWORD
   master:
     persistence:
       storageClass: cephfs
