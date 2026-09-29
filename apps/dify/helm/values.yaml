@@ -166,6 +166,17 @@ plugin_daemon:
     - name: ADMIN_API_KEY
       valueFrom: {secretKeyRef: {name: dify-vault-app, key: PLUGIN_ADMIN_API_KEY}}
 
+# Deployed as dify-crd-controller; runs the serverless plugin runtime
+plugin_controller:
+  resources:
+    requests: {cpu: 50m, memory: 64Mi, ephemeral-storage: 128Mi}
+    limits: {cpu: 200m, memory: 256Mi, ephemeral-storage: 256Mi}
+
+plugin_connector:
+  resources:
+    requests: {cpu: 100m, memory: 128Mi, ephemeral-storage: 256Mi}
+    limits: {cpu: 500m, memory: 512Mi, ephemeral-storage: 1Gi}
+
 redis:
   image:
     pullPolicy: Always
@@ -180,6 +191,8 @@ redis:
       runAsGroup: 10001
       runAsNonRoot: true
       allowPrivilegeEscalation: false
+      # The subchart already mounts /tmp and its config dir as emptyDirs
+      readOnlyRootFilesystem: true
     resources:
       requests: {cpu: 50m, memory: 128Mi, ephemeral-storage: 256Mi}
       limits: {cpu: 250m, memory: 256Mi, ephemeral-storage: 512Mi}
