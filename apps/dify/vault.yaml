@@ -1,0 +1,72 @@
+# Every credential Dify needs, synced from Vault by Vault Secrets Operator.
+# Vault path (mount kv)           -> keys
+#   dify/default/dify-secret      -> username, password   (Postgres user, also used by CNPG)
+#   dify/default/dify-redis       -> REDIS_PASSWORD
+#   dify/default/dify-app         -> SECRET_KEY, SANDBOX_API_KEY, PLUGIN_DAEMON_KEY,
+#                                    PLUGIN_INNER_API_KEY
+#   dify/default/dify-smtp        -> SMTP_USERNAME, SMTP_PASSWORD
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: dify-auth
+spec:
+  method: kubernetes
+  mount: kubernetes
+  kubernetes:
+    audiences:
+      - vault
+    role: secret-reader
+    serviceAccount: default
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-secret
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-secret
+  destination:
+    name: dify-secret
+    create: true
+    type: kubernetes.io/basic-auth
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-redis
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-redis
+  destination:
+    name: dify-redis
+    create: true
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-app
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-app
+  destination:
+    name: dify-app
+    create: true
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: dify-smtp
+spec:
+  vaultAuthRef: dify-auth
+  type: kv-v1
+  mount: kv
+  path: data/dify/default/dify-smtp
+  destination:
+    name: dify-smtp
+    create: true
