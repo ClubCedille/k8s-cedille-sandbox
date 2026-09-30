@@ -1,22 +1,56 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+# Contour HTTPProxy rather than an Ingress: a standard Ingress rejects the
+# cross-namespace TLS secret (tls-delegation/sandbox-tls). Same as apps/gatus.
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
 metadata:
   name: dify
-  annotations:
-    projectcontour.io/response-timeout: "600s"
 spec:
-  ingressClassName: contour
-  tls:
-    - hosts:
-        - dify.sandbox.cedille.club
+  virtualhost:
+    fqdn: dify.sandbox.cedille.club
+    tls:
       secretName: tls-delegation/sandbox-tls
-  rules:
-    - host: dify.sandbox.cedille.club
-      http:
-        paths:
-          - {path: /console/api, pathType: Prefix, backend: {service: {name: dify-api-svc, port: {number: 5001}}}}
-          - {path: /api, pathType: Prefix, backend: {service: {name: dify-api-svc, port: {number: 5001}}}}
-          - {path: /v1, pathType: Prefix, backend: {service: {name: dify-api-svc, port: {number: 5001}}}}
-          - {path: /files, pathType: Prefix, backend: {service: {name: dify-api-svc, port: {number: 5001}}}}
-          - {path: /e, pathType: Prefix, backend: {service: {name: dify-plugin-daemon-svc, port: {number: 5002}}}}
-          - {path: /, pathType: Prefix, backend: {service: {name: dify-web-svc, port: {number: 3000}}}}
+  # Prefixes are plain string matches (longest wins), hence /e/ and not /e,
+  # which would also catch web pages like /explore
+  routes:
+    - conditions:
+        - prefix: /console/api
+      services:
+        - name: dify-api-svc
+          port: 5001
+      timeoutPolicy:
+        response: 600s
+    - conditions:
+        - prefix: /api
+      services:
+        - name: dify-api-svc
+          port: 5001
+      timeoutPolicy:
+        response: 600s
+    - conditions:
+        - prefix: /v1
+      services:
+        - name: dify-api-svc
+          port: 5001
+      timeoutPolicy:
+        response: 600s
+    - conditions:
+        - prefix: /files
+      services:
+        - name: dify-api-svc
+          port: 5001
+      timeoutPolicy:
+        response: 600s
+    - conditions:
+        - prefix: /e/
+      services:
+        - name: dify-plugin-daemon-svc
+          port: 5002
+      timeoutPolicy:
+        response: 600s
+    - conditions:
+        - prefix: /
+      services:
+        - name: dify-web-svc
+          port: 3000
+      timeoutPolicy:
+        response: 600s
